@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Node: Attatch to Nodemon",
+      "processId": "${command:PickProcess}",
+      "stopOnEntry": false,
+      "sourceMaps": true,
+      "restart": true,
+      "smartStep": true,
+      "trace": true,
+      "protocol": "inspector",
+      "timeout": 6000,
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "eg2.tslint",
+    "esbenp.prettier-vscode",
+    "robertohuertasm.vscode-icons",
+    "joelday.docthis",
+    "alefragnani.project-manager",
+    "CoenraadS.bracket-pair-colorizer",
+    "Orta.vscode-jest"
+  ]
+}

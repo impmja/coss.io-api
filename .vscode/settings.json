@@ -1,0 +1,19 @@
+{
+  "editor.formatOnType": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": true,
+  "editor.detectIndentation": true,
+  "editor.tabSize": 2,
+  "tslint.enable": true,
+  "tslint.run": "onType",
+  "tslint.autoFixOnSave": true,
+  "tslint.packageManager": "yarn",
+  "tslint.jsEnable": false,
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.validate.enable": true,
+  "typescript.format.enable": true,
+  "files.exclude": {
+    "node_modules/": true
+  },
+  "problems.decorations.enabled": true
+}

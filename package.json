@@ -1,0 +1,42 @@
+{
+  "name": "coss.io",
+  "version": "0.0.1",
+  "description": "COSS.io API Wrapper",
+  "author": "Jan (impmja) Schulte",
+  "license": "MIT",
+  "private": false,
+  "keywords": ["COSS.io", "typescript", "crypto"],
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 9.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/impmja/coss.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/impmja/coss.io/issues"
+  },
+  "homepage": "https://github.com/impmja/coss.io",
+  "main": "lib/index",
+  "types": "lib/index",
+  "scripts": {
+    "prepublish": "tsc",
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "start": "ts-node ./examples/main.ts",
+    "start:dev": "nodemon ./examples/main.ts",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "9.4.6",
+    "nodemon": "1.15.1",
+    "prettier": "1.10.2",
+    "ts-node": "5.0.0",
+    "tslint": "5.9.1",
+    "typescript": "2.7.2"
+  },
+  "dependencies": {
+    "axios": "0.18.0"
+  }
+}

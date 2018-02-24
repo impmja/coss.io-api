@@ -1,0 +1,15 @@
+{
+  "restartable": "rs",
+  "ext": "ts",
+  "execMap": {
+    "ts": "ts-node --inspect-brk --nolazy"
+  },
+  "watch": ["src"],
+  "ignore": ["**/*.spec.ts"],
+  "env": {
+    "NODE_ENV": "development",
+    "NODE_DEBUG": ""
+  },
+  "debug": true,
+  "verbose": true
+}
