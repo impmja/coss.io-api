@@ -16,6 +16,16 @@ or
 $ yarn install
 ```
 
+* Build the API
+
+```
+$ npm build
+
+or
+
+$ yarn build
+```
+
 * Start the example app
 
 ```
