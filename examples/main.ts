@@ -2,7 +2,11 @@ import { CossIO, CossIOTickerList } from './../lib';
 
 const main = async () => {
   try {
-    const cossIO = new CossIO();
+    const cossIO = new CossIO({
+      cfduid: '<add yours>',
+      coss: '<add yours>',
+      xsrf: '<add yours>',
+    });
 
     try {
       const session = await cossIO.requestSession();
@@ -10,6 +14,37 @@ const main = async () => {
       console.log('---------------------------------');
     } catch (error) {
       console.error('Failed to request session', error);
+    }
+
+    try {
+      const userWallets = await cossIO.requestUserWallets();
+      console.log('User Wallets:');
+      for (const wallet of userWallets) {
+        console.log(
+          `- '${wallet.currencyDisplayLabel} (${
+            wallet.currencyCode
+          })' - '${wallet.ordersBalance.toFixed(8)}'`,
+        );
+      }
+      console.log('---------------------------------');
+    } catch (error) {
+      console.error('Failed to request user wallets', error);
+    }
+
+    try {
+      const userOrders = await cossIO.requestUserOrders({ symbol: 'coss-eth' });
+      console.log('User Orders:', userOrders);
+      console.log('---------------------------------');
+    } catch (error) {
+      console.error('Failed to request user orders', error);
+    }
+
+    try {
+      const orderHistory = await cossIO.requestOrderHistory({ symbol: 'coss-eth' });
+      console.log('Order History:', orderHistory);
+      console.log('---------------------------------');
+    } catch (error) {
+      console.error('Failed to request order history', error);
     }
 
     try {

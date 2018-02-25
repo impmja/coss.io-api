@@ -8,16 +8,26 @@
 import * as url from 'url';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
-import { CossIORawMarketPair, CossIORawDepth } from './coss-io.raw-entities';
+import {
+  CossIORawMarketPair,
+  CossIORawDepth,
+  CossIORawOrder,
+  CossIOWalletList,
+} from './coss-io.raw-entities';
 import {
   CossIOTicker,
   CossIOTickerList,
   CossIOSession,
   CossIODepth,
+  CossIOOrder,
+  CossIOOrderList,
   transformTicker,
   transformTickerList,
   transformSession,
   transformDepth,
+  transformOrder,
+  transformOrders,
+  transformWallets,
 } from './coss-io.transformed-entities';
 
 enum CossIORestApiRequestVerb {
@@ -68,12 +78,15 @@ export interface CossIOCookie {
 export class CossIO {
   private static readonly API_BASE_URL: string = 'https://exchange.coss.io/api/';
   private static readonly API_SESSION_ENDPOINT: string = 'session/';
+  private static readonly API_USER_ORDERS_ENDPOINT: string = 'user/orders/';
+  private static readonly API_USER_WALLETS_ENDPOINT: string = 'user/wallets/';
+  private static readonly API_OPEN_ORDER_HISTORY_ENDPOINT: string = 'order-history/';
   private static readonly API_DEPTH_ENDPOINT: string = 'integrated-market/depth/';
   private static readonly API_MARKET_PAIRS_ENDPOINT: string = 'integrated-market/pairs/';
   private static readonly API_MARKET_PAIR_ENDPOINT: string = 'integrated-market/pair-data/';
 
   private static readonly REQUEST_HEADER_USER_AGENT_KEY: string = 'User-Agent';
-  private static readonly REQUEST_HEADER_USER_AGENT_VALUE: string = 'Mozilla/4.0 (compatible; Node COSS.io API)';
+  private static readonly REQUEST_HEADER_USER_AGENT_VALUE: string = 'Mozilla/5.0 Chrome/63.0.3239.84 Safari/537.36';
   private static readonly REQUEST_HEADER_CONTENT_TYPE_KEY: string = 'Content-Type';
   private static readonly REQUEST_HEADER_CONTENT_TYPE_VALUE: string = 'application/x-www-form-urlencoded';
   private static readonly REQUEST_HEADER_ACCEPT_KEY: string = 'Accept';
@@ -83,7 +96,10 @@ export class CossIO {
   private static readonly REQUEST_HEADER_AUTHORITY_KEY: string = 'authority';
   private static readonly REQUEST_HEADER_AUTHORITY_VALUE: string = 'exchange.coss.io';
   private static readonly REQUEST_HEADER_XSRF_TOKEN_KEY: string = 'x-xsrf-token';
-  private static readonly REQUEST_HEADER_SET_COOKIE_KEY: string = 'set-cookie';
+  private static readonly REQUEST_HEADER_COOKIE_KEY: string = 'cookie';
+  private static readonly REQUEST_HEADER_PRAGMA_KEY: string = 'pragma';
+  private static readonly REQUEST_HEADER_CACHE_CONTROL_KEY: string = 'cache-control';
+  private static readonly REQUEST_HEADER_NO_CACHE_VALUE: string = 'no-cache';
 
   private readonly cookie?: CossIOCookie | null;
 
@@ -95,7 +111,49 @@ export class CossIO {
     return this.request({
       verb: CossIORestApiRequestVerb.GET,
       url: CossIO.API_SESSION_ENDPOINT,
+      security: CossIORestApiSecurity.Private,
       transformFn: transformSession,
+    });
+  }
+
+  public requestUserWallets(): Promise<CossIOWalletList> {
+    return this.request({
+      verb: CossIORestApiRequestVerb.GET,
+      url: CossIO.API_USER_WALLETS_ENDPOINT,
+      security: CossIORestApiSecurity.Private,
+      transformFn: transformWallets,
+    });
+  }
+
+  public requestUserOrders(params: { symbol: string }): Promise<CossIOOrderList> {
+    const { symbol } = params;
+    if (!symbol || !symbol.length) {
+      throw new CossIOError({
+        message: 'Symbol is missing.',
+      });
+    }
+
+    return this.request({
+      verb: CossIORestApiRequestVerb.GET,
+      url: url.resolve(CossIO.API_USER_ORDERS_ENDPOINT, symbol),
+      security: CossIORestApiSecurity.Private,
+      transformFn: transformOrders,
+    });
+  }
+
+  public requestOrderHistory(params: { symbol: string }): Promise<CossIOOrderList> {
+    const { symbol } = params;
+    if (!symbol || !symbol.length) {
+      throw new CossIOError({
+        message: 'Symbol is missing.',
+      });
+    }
+
+    return this.request({
+      verb: CossIORestApiRequestVerb.GET,
+      url: url.resolve(CossIO.API_OPEN_ORDER_HISTORY_ENDPOINT, symbol),
+      security: CossIORestApiSecurity.Public,
+      transformFn: transformOrders,
     });
   }
 
@@ -163,10 +221,12 @@ export class CossIO {
       [CossIO.REQUEST_HEADER_USER_AGENT_KEY]: CossIO.REQUEST_HEADER_USER_AGENT_VALUE,
       [CossIO.REQUEST_HEADER_ORIGIN_KEY]: CossIO.REQUEST_HEADER_ORIGIN_VALUE,
       [CossIO.REQUEST_HEADER_AUTHORITY_KEY]: CossIO.REQUEST_HEADER_AUTHORITY_VALUE,
-
-      // ...(security === CossIORestApiSecurity.Private && {
-      //   [CossIO.REQUEST_HEADER_API_KEY]: this.configuration.apiKey,
-      // }),
+      [CossIO.REQUEST_HEADER_PRAGMA_KEY]: CossIO.REQUEST_HEADER_NO_CACHE_VALUE,
+      [CossIO.REQUEST_HEADER_CACHE_CONTROL_KEY]: CossIO.REQUEST_HEADER_NO_CACHE_VALUE,
+      ...(security === CossIORestApiSecurity.Private &&
+        this.cookie && { [CossIO.REQUEST_HEADER_XSRF_TOKEN_KEY]: this.cookie.xsrf }),
+      ...(security === CossIORestApiSecurity.Private &&
+        this.cookie && { [CossIO.REQUEST_HEADER_COOKIE_KEY]: this.generateCookie() }),
     };
 
     const options: AxiosRequestConfig = {
@@ -218,5 +278,20 @@ export class CossIO {
           }),
         );
       });
+  }
+
+  private generateCookie(): string {
+    if (!this.cookie || !this.cookie.cfduid || !this.cookie.coss || !this.cookie.xsrf) {
+      throw new CossIOError({
+        message: 'Invalid Cookie.',
+        context: {
+          cookie: this.cookie,
+        },
+      });
+    }
+
+    return `__cfduid=${this.cookie.cfduid}; coss.s=${this.cookie.coss}; XSRF-TOKEN=${
+      this.cookie.xsrf
+    }`;
   }
 }

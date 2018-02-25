@@ -5,6 +5,10 @@ import {
   CossIORawSession,
   CossIORawDepth,
   CossIORawDepthSideList,
+  CossIORawOrder,
+  CossIORawOrderList,
+  CossIORawWallet,
+  CossIORawUserWalletsRoot,
 } from './coss-io.raw-entities';
 
 export interface CossIOTradingPair {
@@ -49,6 +53,48 @@ export interface CossIODepth {
   asks: CossIODepthSideList;
   bids: CossIODepthSideList;
 }
+
+export enum CossIOOrderSide {
+  BUY = 'buy',
+  SELL = 'sell',
+}
+
+export interface CossIOOrder {
+  id: string;
+  side: CossIOOrderSide;
+  amount: number;
+  price: number;
+  total: number;
+  timestamp: Date;
+}
+
+export type CossIOOrderList = CossIOOrder[];
+
+export interface CossIOWallet {
+  id: string;
+  userId: string;
+  reference: string;
+  coldWalletBalance: string;
+  transactionId?: string;
+  ordersBalance: number;
+  lastTransactionId?: string;
+  lastBlockNumber: number;
+  hasPendingDepositTransactions: boolean;
+  currencyGuid: string;
+  currencyType: string;
+  currencyName: string;
+  currencyCode: string;
+  currencyPrecision: number;
+  currencyDisplayLabel: string;
+  currencyIsErc20Token: boolean;
+  currencyWithdrawalFee: number;
+  currencyMinWithdrawalAmount: number;
+  currencyMinDepositAmount: number;
+  currencyIsWithdrawalLocked: boolean;
+  currencyIsDepositLocked: boolean;
+}
+
+export type CossIOWalletList = CossIOWallet[];
 
 export const transformTicker = (data: CossIORawTicker): CossIOTicker => {
   const {
@@ -130,4 +176,86 @@ export const transformDepth = (params: { data: CossIORawDepth; level: number }):
     bids: transform(data[0]),
     asks: transform(data[1]),
   };
+};
+
+export const transformOrder = (data: CossIORawOrder): CossIOOrder => {
+  const { guid: id, action, amount, price, total, created_at } = data;
+
+  return {
+    id,
+    side: action.toLowerCase() === 'buy' ? CossIOOrderSide.BUY : CossIOOrderSide.SELL,
+    amount: parseFloat(amount),
+    price: parseFloat(price),
+    total: parseFloat(total),
+    timestamp: new Date(created_at),
+  };
+};
+
+export const transformOrders = (data: CossIORawOrderList): CossIOOrderList => {
+  const result = [];
+  for (const order of data) {
+    result.push(transformOrder(order));
+  }
+  return result;
+};
+
+export const transformWallet = (data: CossIORawWallet): CossIOWallet => {
+  const {
+    guid: id,
+    user_guid: userId,
+    reference,
+    cold_wallet_balance: coldWalletBalance,
+    transaction_id: transactionId = null,
+    orders_balance,
+    last_transaction_id: lastTransactionId = null,
+    last_block_number,
+    has_pending_deposit_transactions: hasPendingDepositTransactions,
+    currencyGuid,
+    currencyType,
+    currencyName,
+    currencyCode,
+    currencyPrecision,
+    currencyDisplayLabel,
+    currencyIsErc20Token,
+    currencyWithdrawalFee,
+    currencyMinWithdrawalAmount,
+    currencyMinDepositAmount,
+    currencyIsWithdrawalLocked,
+    currencyIsDepositLocked,
+  } = data;
+
+  return {
+    id,
+    userId,
+    reference,
+    coldWalletBalance,
+    transactionId,
+    ordersBalance: parseFloat(orders_balance),
+    lastTransactionId,
+    lastBlockNumber: parseInt(last_block_number, 10),
+    hasPendingDepositTransactions,
+    currencyGuid,
+    currencyType,
+    currencyName,
+    currencyCode,
+    currencyPrecision,
+    currencyDisplayLabel,
+    currencyIsErc20Token,
+    currencyWithdrawalFee: parseFloat(currencyWithdrawalFee),
+    currencyMinWithdrawalAmount: parseFloat(currencyMinWithdrawalAmount),
+    currencyMinDepositAmount: parseFloat(currencyMinDepositAmount),
+    currencyIsWithdrawalLocked,
+    currencyIsDepositLocked,
+  };
+};
+
+export const transformWallets = (data: CossIORawUserWalletsRoot): CossIOWalletList => {
+  const { payload = { wallets: [] } } = data;
+  const { wallets = [] } = payload;
+
+  const result = [];
+  for (const wallet of wallets) {
+    result.push(transformWallet(wallet));
+  }
+  return result;
 };

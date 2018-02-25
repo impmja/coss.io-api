@@ -33,3 +33,49 @@ export interface CossIORawSession {
 export type CossIORawDepthSide = [string, string];
 export type CossIORawDepthSideList = CossIORawDepthSide[];
 export type CossIORawDepth = [CossIORawDepthSideList, CossIORawDepthSideList];
+
+export interface CossIORawOrder {
+  guid: string;
+  action: string;
+  amount: string;
+  price: string;
+  total: string;
+  created_at: number;
+}
+
+export type CossIORawOrderList = CossIORawOrder[];
+
+export interface CossIORawWallet {
+  guid: string;
+  user_guid: string;
+  reference: string;
+  cold_wallet_balance: string;
+  transaction_id?: any;
+  orders_balance: string;
+  last_transaction_id?: any;
+  last_block_number: string;
+  has_pending_deposit_transactions: boolean;
+  currencyGuid: string;
+  currencyType: string;
+  currencyName: string;
+  currencyCode: string;
+  currencyPrecision: number;
+  currencyDisplayLabel: string;
+  currencyIsErc20Token: boolean;
+  currencyWithdrawalFee: string;
+  currencyMinWithdrawalAmount: string;
+  currencyMinDepositAmount: string;
+  currencyIsWithdrawalLocked: boolean;
+  currencyIsDepositLocked: boolean;
+}
+
+export type CossIORawWalletList = CossIORawWallet[];
+
+export interface CossIORawUserWallets {
+  wallets: CossIORawWalletList;
+}
+
+export interface CossIORawUserWalletsRoot {
+  successful: boolean;
+  payload: CossIORawUserWallets;
+}
