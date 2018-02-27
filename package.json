@@ -21,7 +21,7 @@
   "main": "lib/index",
   "types": "lib/index",
   "scripts": {
-    "prepublish": "tsc",
+    "prepublishOnly": "tsc",
     "build": "tsc",
     "build:watch": "tsc -w",
     "start": "ts-node ./examples/main.ts",
