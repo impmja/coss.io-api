@@ -51,9 +51,9 @@ export interface CossIOWallet {
     id: string;
     userId: string;
     reference: string;
-    coldWalletBalance: string;
+    availableBalance: number;
     transactionId?: string;
-    ordersBalance: number;
+    lockedBalance: number;
     lastTransactionId?: string;
     lastBlockNumber: number;
     hasPendingDepositTransactions: boolean;

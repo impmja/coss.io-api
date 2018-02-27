@@ -74,9 +74,9 @@ export interface CossIOWallet {
   id: string;
   userId: string;
   reference: string;
-  coldWalletBalance: string;
+  availableBalance: number;
   transactionId?: string;
-  ordersBalance: number;
+  lockedBalance: number;
   lastTransactionId?: string;
   lastBlockNumber: number;
   hasPendingDepositTransactions: boolean;
@@ -180,7 +180,6 @@ export const transformDepth = (params: { data: CossIORawDepth; level: number }):
 
 export const transformOrder = (data: CossIORawOrder): CossIOOrder => {
   const { guid: id, action, amount, price, total, created_at } = data;
-
   return {
     id,
     side: action.toLowerCase() === 'buy' ? CossIOOrderSide.BUY : CossIOOrderSide.SELL,
@@ -204,7 +203,7 @@ export const transformWallet = (data: CossIORawWallet): CossIOWallet => {
     guid: id,
     user_guid: userId,
     reference,
-    cold_wallet_balance: coldWalletBalance,
+    cold_wallet_balance,
     transaction_id: transactionId = null,
     orders_balance,
     last_transaction_id: lastTransactionId = null,
@@ -228,9 +227,9 @@ export const transformWallet = (data: CossIORawWallet): CossIOWallet => {
     id,
     userId,
     reference,
-    coldWalletBalance,
+    availableBalance: parseFloat(cold_wallet_balance),
     transactionId,
-    ordersBalance: parseFloat(orders_balance),
+    lockedBalance: parseFloat(orders_balance),
     lastTransactionId,
     lastBlockNumber: parseInt(last_block_number, 10),
     hasPendingDepositTransactions,
