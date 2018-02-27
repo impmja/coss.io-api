@@ -1,16 +1,4 @@
-import { CossIOTicker, CossIOTickerList, CossIOSession, CossIODepth, CossIOOrderList, CossIOWalletList } from './coss-io.transformed-entities';
-export declare class CossIOError extends Error {
-    readonly code?: number | string;
-    readonly message: string;
-    readonly innerError?: string | object;
-    readonly context?: string | object;
-    constructor(params: {
-        message: string;
-        code?: number | string;
-        innerError?: string | object;
-        context?: string | object;
-    });
-}
+import { CossIOTicker, CossIOTickerList, CossIOSession, CossIODepth, CossIOHistoryOrderList, CossIOOrderList, CossIOWalletList, CossIOOrderSide, CossIOOrderType } from './coss-io.transformed-entities';
 export interface CossIOCookie {
     xsrf: string;
     coss: string;
@@ -25,6 +13,10 @@ export declare class CossIO {
     private static readonly API_DEPTH_ENDPOINT;
     private static readonly API_MARKET_PAIRS_ENDPOINT;
     private static readonly API_MARKET_PAIR_ENDPOINT;
+    private static readonly API_MARKET_ORDER_BUY_ENDPOINT;
+    private static readonly API_MARKET_ORDER_SELL_ENDPOINT;
+    private static readonly API_LIMIT_ORDER_BUY_ENDPOINT;
+    private static readonly API_LIMIT_ORDER_SELL_ENDPOINT;
     private static readonly REQUEST_HEADER_USER_AGENT_KEY;
     private static readonly REQUEST_HEADER_USER_AGENT_VALUE;
     private static readonly REQUEST_HEADER_CONTENT_TYPE_KEY;
@@ -49,7 +41,7 @@ export declare class CossIO {
     }): Promise<CossIOOrderList>;
     requestOrderHistory(params: {
         symbol: string;
-    }): Promise<CossIOOrderList>;
+    }): Promise<CossIOHistoryOrderList>;
     requestDepth(params: {
         symbol: string;
         level?: number;
@@ -58,6 +50,14 @@ export declare class CossIO {
     requestTicker(params: {
         symbol: string;
     }): Promise<CossIOTicker>;
+    placeOrder(params: {
+        symbol: string;
+        side: CossIOOrderSide;
+        type: CossIOOrderType;
+        price?: number;
+        amount: number;
+        session: CossIOSession;
+    }): Promise<void>;
     private request<T, R>(params);
     private generateCookie();
 }

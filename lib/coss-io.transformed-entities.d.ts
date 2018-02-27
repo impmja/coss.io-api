@@ -1,4 +1,5 @@
-import { CossIORawTicker, CossIORawSession, CossIORawOrder, CossIORawWallet, CossIORawUserWalletsRoot } from './coss-io.raw-entities';
+import { CossIORawError, CossIORawTicker, CossIORawSession, CossIORawHistoryOrder, CossIORawOrder, CossIORawWallet, CossIORawUserWalletsRoot } from './coss-io.raw-entities';
+import { CossIOError } from './coss-io.error';
 export interface CossIOTradingPair {
     id: string;
     fullName: string;
@@ -24,7 +25,7 @@ export declare type CossIOTickerList = CossIOTicker[];
 export interface CossIOSession {
     makerFee: number;
     makerFeePercentage: number;
-    takeFee: number;
+    takerFee: number;
     takerFeePercentage: number;
 }
 export interface CossIODepthSide {
@@ -40,9 +41,24 @@ export declare enum CossIOOrderSide {
     BUY = "buy",
     SELL = "sell",
 }
-export interface CossIOOrder {
+export declare enum CossIOOrderType {
+    MARKET = "market",
+    LIMIT = "limit",
+}
+export interface CossIOHistoryOrder {
     id: string;
     side: CossIOOrderSide;
+    amount: number;
+    price: number;
+    total: number;
+    timestamp: Date;
+}
+export declare type CossIOHistoryOrderList = CossIOHistoryOrder[];
+export interface CossIOOrder {
+    id: string;
+    symbol: string;
+    side: CossIOOrderSide;
+    type: CossIOOrderType;
     amount: number;
     price: number;
     total: number;
@@ -80,7 +96,13 @@ export declare const transformDepth: (params: {
     data: [[string, string][], [string, string][]];
     level: number;
 }) => CossIODepth;
-export declare const transformOrder: (data: CossIORawOrder) => CossIOOrder;
-export declare const transformOrders: (data: CossIORawOrder[]) => CossIOOrder[];
+export declare const transformHistoryOrder: (data: CossIORawHistoryOrder) => CossIOHistoryOrder;
+export declare const transformHistoryOrders: (data: CossIORawHistoryOrder[]) => CossIOHistoryOrder[];
+export declare const transformOpenOrder: (data: CossIORawOrder) => CossIOOrder;
+export declare const transformOpenOrders: (data: CossIORawOrder[]) => CossIOOrder[];
 export declare const transformWallet: (data: CossIORawWallet) => CossIOWallet;
 export declare const transformWallets: (data: CossIORawUserWalletsRoot) => CossIOWallet[];
+export declare const transformError: (params: {
+    data: CossIORawError;
+    context?: any;
+}) => CossIOError;

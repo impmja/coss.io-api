@@ -1,3 +1,8 @@
+export interface CossIORawError {
+  successful: boolean;
+  payload: string;
+}
+
 export interface CossIORawTicker {
   id: string;
   pair: string;
@@ -49,7 +54,7 @@ export type CossIORawDepthSide = [string, string];
 export type CossIORawDepthSideList = CossIORawDepthSide[];
 export type CossIORawDepth = [CossIORawDepthSideList, CossIORawDepthSideList];
 
-export interface CossIORawOrder {
+export interface CossIORawHistoryOrder {
   guid: string;
   action: string;
   amount: string;
@@ -58,7 +63,35 @@ export interface CossIORawOrder {
   created_at: number;
 }
 
+export type CossIORawHistoryOrderList = CossIORawHistoryOrder[];
+
+export interface CossIORawOrder {
+  amount: string;
+  created_at: number;
+  order_guid: string;
+  pair_id: string;
+  price: string;
+  total: string;
+  type: string;
+  tradeType: string;
+}
 export type CossIORawOrderList = CossIORawOrder[];
+
+export type CossIORawTradeType = 'buy' | 'sell';
+
+export type CossIORawOrderType = 'market' | 'limit';
+
+export interface CossIORawTrade {
+  pairId: string;
+  tradeType: CossIORawTradeType;
+  orderType: CossIORawOrderType;
+  orderPrice?: string;
+  orderAmount: string;
+  orderTotalWithFee: string;
+  orderTotalWithoutFee: string;
+  feeValue: string;
+  fee: string;
+}
 
 export interface CossIORawWallet {
   guid: string;

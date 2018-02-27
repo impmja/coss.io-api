@@ -1,15 +1,20 @@
 import {
+  CossIORawError,
   CossIORawTicker,
   CossIORawMarketPair,
   CossIORawTickerList,
   CossIORawSession,
   CossIORawDepth,
   CossIORawDepthSideList,
+  CossIORawHistoryOrder,
+  CossIORawHistoryOrderList,
   CossIORawOrder,
   CossIORawOrderList,
   CossIORawWallet,
   CossIORawUserWalletsRoot,
 } from './coss-io.raw-entities';
+
+import { CossIOError } from './coss-io.error';
 
 export interface CossIOTradingPair {
   id: string;
@@ -40,7 +45,7 @@ export type CossIOTickerList = CossIOTicker[];
 export interface CossIOSession {
   makerFee: number;
   makerFeePercentage: number;
-  takeFee: number;
+  takerFee: number;
   takerFeePercentage: number;
 }
 
@@ -61,9 +66,27 @@ export enum CossIOOrderSide {
   SELL = 'sell',
 }
 
-export interface CossIOOrder {
+export enum CossIOOrderType {
+  MARKET = 'market',
+  LIMIT = 'limit',
+}
+
+export interface CossIOHistoryOrder {
   id: string;
   side: CossIOOrderSide;
+  amount: number;
+  price: number;
+  total: number;
+  timestamp: Date;
+}
+
+export type CossIOHistoryOrderList = CossIOHistoryOrder[];
+
+export interface CossIOOrder {
+  id: string;
+  symbol: string;
+  side: CossIOOrderSide;
+  type: CossIOOrderType;
   amount: number;
   price: number;
   total: number;
@@ -158,7 +181,7 @@ export const transformSession = (data: CossIORawSession): CossIOSession => {
   return {
     makerFee: parseFloat(tx_fee_make),
     makerFeePercentage: parseFloat(maker_fee_percentage),
-    takeFee: parseFloat(tx_fee_take),
+    takerFee: parseFloat(tx_fee_take),
     takerFeePercentage: parseFloat(taker_fee_percentage),
   };
 };
@@ -191,7 +214,7 @@ export const transformDepth = (params: { data: CossIORawDepth; level: number }):
   };
 };
 
-export const transformOrder = (data: CossIORawOrder): CossIOOrder => {
+export const transformHistoryOrder = (data: CossIORawHistoryOrder): CossIOHistoryOrder => {
   const { guid: id, action, amount, price, total, created_at } = data;
   return {
     id,
@@ -203,10 +226,43 @@ export const transformOrder = (data: CossIORawOrder): CossIOOrder => {
   };
 };
 
-export const transformOrders = (data: CossIORawOrderList): CossIOOrderList => {
+export const transformHistoryOrders = (data: CossIORawHistoryOrderList): CossIOHistoryOrderList => {
+  console.log('open orders', data);
   const result = [];
   for (const order of data) {
-    result.push(transformOrder(order));
+    result.push(transformHistoryOrder(order));
+  }
+  return result;
+};
+
+export const transformOpenOrder = (data: CossIORawOrder): CossIOOrder => {
+  const {
+    order_guid: id,
+    amount,
+    price,
+    total,
+    created_at,
+    type,
+    tradeType,
+    pair_id: symbol,
+  } = data;
+  return {
+    id,
+    symbol,
+    side: type.toLowerCase() === 'buy' ? CossIOOrderSide.BUY : CossIOOrderSide.SELL,
+    type:
+      tradeType.toLowerCase() === 'limit-order' ? CossIOOrderType.LIMIT : CossIOOrderType.MARKET,
+    amount: parseFloat(amount),
+    price: parseFloat(price),
+    total: parseFloat(total),
+    timestamp: new Date(created_at),
+  };
+};
+
+export const transformOpenOrders = (data: CossIORawOrderList): CossIOOrderList => {
+  const result = [];
+  for (const order of data) {
+    result.push(transformOpenOrder(order));
   }
   return result;
 };
@@ -270,4 +326,13 @@ export const transformWallets = (data: CossIORawUserWalletsRoot): CossIOWalletLi
     result.push(transformWallet(wallet));
   }
   return result;
+};
+
+export const transformError = (params: { data: CossIORawError; context?: any }): CossIOError => {
+  const { data, context } = params;
+  const { successful = false, payload = 'Unknown error' } = data;
+  return new CossIOError({
+    message: payload,
+    context,
+  });
 };
