@@ -68,27 +68,27 @@ const main = async () => {
     //   console.error('Failed to request depth', error);
     // }
 
-    // try {
-    //   const tickers = await cossIO.requestTickers();
-    //   console.log('All Tickers:');
-    //   for (const pair of tickers) {
-    //     console.log(`- '${pair.tradingPair.id}'`);
-    //   }
-    //   console.log('---------------------------------');
-    // } catch (error) {
-    //   console.error('Failed to request ticker list', error);
-    // }
+    try {
+      const tickers = await cossIO.requestTickers();
+      console.log('All Tickers:');
+      for (const pair of tickers) {
+        console.log(`- '${pair.tradingPair.id}' - Price: '${pair.price.toFixed(8)}'`);
+      }
+      console.log('---------------------------------');
+    } catch (error) {
+      console.error('Failed to request ticker list', error);
+    }
 
     const intervalTicker = async () => {
       try {
         const tickerCossETH = await cossIO.requestTicker({ symbol: 'coss-eth' });
         console.log('Ticker: COSS/ETH');
-        console.log(`Current Price: '${tickerCossETH.price}'`);
+        console.log(`Current Price: '${tickerCossETH.price.toFixed(8)}'`);
         console.log('---------------------------------');
 
         const tickerCossBTC = await cossIO.requestTicker({ symbol: 'coss-btc' });
         console.log('Ticker: COSS/BTC');
-        console.log(`Current Price: '${tickerCossBTC.price}'`);
+        console.log(`Current Price: '${tickerCossBTC.price.toFixed(8)}'`);
         console.log('---------------------------------');
       } catch (error) {
         console.error('Failed to request ticker', error);
