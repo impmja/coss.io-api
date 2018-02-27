@@ -22,8 +22,10 @@ export interface CossIOTicker {
 }
 export declare type CossIOTickerList = CossIOTicker[];
 export interface CossIOSession {
-    successful: boolean;
-    payload: string[];
+    makerFee: number;
+    makerFeePercentage: number;
+    takeFee: number;
+    takerFeePercentage: number;
 }
 export interface CossIODepthSide {
     price: number;

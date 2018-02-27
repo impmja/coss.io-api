@@ -25,9 +25,24 @@ export interface CossIORawMarketPair {
   accountOrderHistory: any[];
 }
 
+export interface CossIORawSessionPayload {
+  guid: string;
+  full_name?: any;
+  username: string;
+  email_address: string;
+  kyc_level_guid?: any;
+  referral_code: string;
+  tx_fee_make: string;
+  tx_fee_take: string;
+  twofactor_active: boolean;
+  maker_fee_percentage: string;
+  taker_fee_percentage: string;
+  site_updates_count: string;
+}
+
 export interface CossIORawSession {
   successful: boolean;
-  payload: string[];
+  payload: CossIORawSessionPayload;
 }
 
 export type CossIORawDepthSide = [string, string];

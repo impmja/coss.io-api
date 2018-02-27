@@ -38,8 +38,10 @@ export interface CossIOTicker {
 export type CossIOTickerList = CossIOTicker[];
 
 export interface CossIOSession {
-  successful: boolean;
-  payload: string[];
+  makerFee: number;
+  makerFeePercentage: number;
+  takeFee: number;
+  takerFeePercentage: number;
 }
 
 export interface CossIODepthSide {
@@ -142,11 +144,22 @@ export const transformTickerList = (data: CossIORawTickerList): CossIOTickerList
 };
 
 export const transformSession = (data: CossIORawSession): CossIOSession => {
-  const { successful, payload } = data;
+  const {
+    successful,
+    payload = {
+      tx_fee_make: '0.002',
+      tx_fee_take: '0.002',
+      maker_fee_percentage: '0.002',
+      taker_fee_percentage: '0.002',
+    },
+  } = data;
+  const { tx_fee_make, tx_fee_take, maker_fee_percentage, taker_fee_percentage } = payload;
 
   return {
-    successful,
-    payload,
+    makerFee: parseFloat(tx_fee_make),
+    makerFeePercentage: parseFloat(maker_fee_percentage),
+    takeFee: parseFloat(tx_fee_take),
+    takerFeePercentage: parseFloat(taker_fee_percentage),
   };
 };
 
