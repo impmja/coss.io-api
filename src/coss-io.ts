@@ -8,12 +8,7 @@
 import * as url from 'url';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
-import {
-  CossIORawMarketPair,
-  CossIORawDepth,
-  CossIORawOrder,
-  CossIOWalletList,
-} from './coss-io.raw-entities';
+import { CossIORawMarketPair, CossIORawDepth, CossIORawOrder } from './coss-io.raw-entities';
 import {
   CossIOTicker,
   CossIOTickerList,
@@ -21,6 +16,7 @@ import {
   CossIODepth,
   CossIOOrder,
   CossIOOrderList,
+  CossIOWalletList,
   transformTicker,
   transformTickerList,
   transformSession,

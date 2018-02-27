@@ -19,7 +19,7 @@ $ yarn install
 * Build the API
 
 ```
-$ npm build
+$ npm run build
 
 or
 
@@ -29,7 +29,7 @@ $ yarn build
 * Start the example app
 
 ```
-$ npm start
+$ npm run start
 
 or
 
