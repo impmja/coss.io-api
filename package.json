@@ -25,6 +25,7 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "start": "ts-node ./examples/main.ts",
+    "start:js": "node ./examples/main.js",
     "start:dev": "nodemon ./examples/main.ts",
     "lint": "tslint -p tsconfig.json"
   },
