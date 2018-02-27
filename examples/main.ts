@@ -44,7 +44,12 @@ const main = async () => {
 
     try {
       const userOrders = await cossIO.requestUserOrders({ symbol: 'coss-eth' });
-      console.log('User Orders:', userOrders);
+      if (userOrders && userOrders.length > 0) {
+        console.log('User Orders:', userOrders);
+        const firstOrder = userOrders[0];
+        console.log('Cancel first Order:', firstOrder);
+        await cossIO.cancelOrder({ order: firstOrder });
+      }
       console.log('---------------------------------');
     } catch (error) {
       console.error('Failed to request user orders', error);
@@ -73,6 +78,7 @@ const main = async () => {
     //   console.log('All Tickers:');
     //   for (const pair of tickers) {
     //     console.log(`- '${pair.tradingPair.id}'`);
+    //     console.log(`- '${pair.price}'`);
     //   }
     //   console.log('---------------------------------');
     // } catch (error) {

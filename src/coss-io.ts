@@ -75,6 +75,7 @@ export class CossIO {
   private static readonly API_MARKET_ORDER_SELL_ENDPOINT: string = 'market-order/sell';
   private static readonly API_LIMIT_ORDER_BUY_ENDPOINT: string = 'limit-order/buy';
   private static readonly API_LIMIT_ORDER_SELL_ENDPOINT: string = 'limit-order/sell';
+  private static readonly API_LIMIT_ORDER_CANCEL_ENDPOINT: string = 'limit-order/';
 
   private static readonly REQUEST_HEADER_USER_AGENT_KEY: string = 'User-Agent';
   private static readonly REQUEST_HEADER_USER_AGENT_VALUE: string = 'Mozilla/5.0 Chrome/63.0.3239.84 Safari/537.36';
@@ -268,7 +269,6 @@ export class CossIO {
         : type === CossIOOrderType.LIMIT
           ? CossIO.API_LIMIT_ORDER_SELL_ENDPOINT
           : CossIO.API_MARKET_ORDER_SELL_ENDPOINT;
-    console.log('Trade', url, payload);
 
     return this.request({
       verb: CossIORestApiRequestVerb.POST,
@@ -276,6 +276,46 @@ export class CossIO {
       payload,
       security: CossIORestApiSecurity.Private,
       transformFn: (data: any) => data,
+    });
+  }
+
+  public cancelOrder(params: { order: CossIOOrder }): Promise<void> {
+    const { order } = params;
+    if (!order) {
+      throw new CossIOError({
+        message: 'Order is missing.',
+      });
+    }
+
+    if (!order.id) {
+      throw new CossIOError({
+        message: 'Order id is missing.',
+      });
+    }
+
+    if (!order.symbol) {
+      throw new CossIOError({
+        message: 'Order symbol is missing.',
+      });
+    }
+
+    if (!order.side) {
+      throw new CossIOError({
+        message: 'Order side is missing.',
+      });
+    }
+
+    const url = urlHelper.resolve(
+      urlHelper.resolve(
+        urlHelper.resolve(CossIO.API_LIMIT_ORDER_CANCEL_ENDPOINT, `${order.side}/`),
+        `${order.symbol}/`,
+      ),
+      `${order.id}/`,
+    );
+    return this.request({
+      verb: CossIORestApiRequestVerb.DELETE,
+      url,
+      security: CossIORestApiSecurity.Private,
     });
   }
 

@@ -1,4 +1,4 @@
-import { CossIOTicker, CossIOTickerList, CossIOSession, CossIODepth, CossIOHistoryOrderList, CossIOOrderList, CossIOWalletList, CossIOOrderSide, CossIOOrderType } from './coss-io.transformed-entities';
+import { CossIOTicker, CossIOTickerList, CossIOSession, CossIODepth, CossIOHistoryOrderList, CossIOOrder, CossIOOrderList, CossIOWalletList, CossIOOrderSide, CossIOOrderType } from './coss-io.transformed-entities';
 export interface CossIOCookie {
     xsrf: string;
     coss: string;
@@ -17,6 +17,7 @@ export declare class CossIO {
     private static readonly API_MARKET_ORDER_SELL_ENDPOINT;
     private static readonly API_LIMIT_ORDER_BUY_ENDPOINT;
     private static readonly API_LIMIT_ORDER_SELL_ENDPOINT;
+    private static readonly API_LIMIT_ORDER_CANCEL_ENDPOINT;
     private static readonly REQUEST_HEADER_USER_AGENT_KEY;
     private static readonly REQUEST_HEADER_USER_AGENT_VALUE;
     private static readonly REQUEST_HEADER_CONTENT_TYPE_KEY;
@@ -57,6 +58,9 @@ export declare class CossIO {
         price?: number;
         amount: number;
         session: CossIOSession;
+    }): Promise<void>;
+    cancelOrder(params: {
+        order: CossIOOrder;
     }): Promise<void>;
     private request<T, R>(params);
     private generateCookie();
